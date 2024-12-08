@@ -1,15 +1,22 @@
 import os
 DATASETS = {
-    "dataset_1": {
+    "The Wildfire Dataset": {
         "train": os.path.join("dataset_1", "train"),
         "test": os.path.join("dataset_1", "test"),
         "val": os.path.join("dataset_1", "val"),
-        "augment": True
+        "augment": False,
+        "source_url": "https://www.kaggle.com/datasets/elmadafri/the-wildfire-dataset/"
     },
-    "dataset_2": {
-        "train": os.path.join("dataset_2", "Training and Validation"),
+    "DeepFire": {
+        "train": os.path.join("dataset_2", "Training"),
         "test": os.path.join("dataset_2", "Testing"),
-        "augment": True
+        "augment": False,
+        "source_url": "https://www.kaggle.com/datasets/alik05/forest-fire-dataset/"
+    },
+    "FIRE": {
+        "train": "dataset_3",
+        "augment": False,
+        "source_url": "https://www.kaggle.com/datasets/phylake1337/fire-dataset/"
     },
 }
 train_dirs = [DATASETS[dataset].get('train') for dataset in DATASETS]
