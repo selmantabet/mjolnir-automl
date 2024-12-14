@@ -7,6 +7,7 @@
 /req_cmd.txt
 /runs
 /venv
+/checkpoint
 /wildfire-camera-detection-keras-v2-training-reshuffle.ipynb
 /wildfire-camera-detection-keras-v2-with-validation.ipynb
 /__pycache__
