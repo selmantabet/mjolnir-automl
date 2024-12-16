@@ -8,7 +8,7 @@
 /runs
 /venv
 /checkpoint
-/Junk
+/old
 /__pycache__
 /tmp
 *.jpg
