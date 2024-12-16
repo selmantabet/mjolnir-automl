@@ -3,7 +3,7 @@ from keras.metrics import Precision, Recall, AUC
 from tensorflow.keras.applications import *
 from custom_metrics import f1_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from customnet import CUSTOMNET
+from wildfirenet import WILDFIRENET
 
 DATASETS = {
     "The Wildfire Dataset": {
@@ -26,10 +26,11 @@ DATASETS = {
     },
 }
 
-default_train_parameters = {
-    "datasets": DATASETS,
+default_cfg = {
+    "train": DATASETS,
+    "test": "test_combined",
     "keras_models": [ResNet50V2, VGG19, MobileNetV3Small],
-    "custom_models": [CUSTOMNET],
+    "custom_models": [WILDFIRENET],
     "hyperparameters": {
         "batch_size": 32,
         "epochs": 80,
@@ -51,7 +52,8 @@ default_train_parameters = {
                         monitor='val_loss', save_best_only=True),
         ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                           patience=5, verbose=1)
-    ]
+    ],
+    "enforce_resolution": False
 }
 
 # base_models = [ResNet50V2, InceptionV3, VGG16, VGG19, Xception, MobileNetV3Small, DenseNet121, EfficientNetV2S, CUSTOMNET]

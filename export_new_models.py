@@ -6,7 +6,7 @@ from tensorflow.keras.models import Model
 from keras.metrics import Precision, Recall, AUC
 import os
 from custom_metrics import f1_score
-from customnet import *
+from wildfirenet import *
 
 callbacks_list = [
     EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
