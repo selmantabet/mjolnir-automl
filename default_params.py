@@ -24,12 +24,18 @@ DATASETS = {
         # "augment": False,
         "source_url": "https://www.kaggle.com/datasets/phylake1337/fire-dataset/"
     },
+    "Forest Fire": {
+        "train": os.path.join("dataset_4", "train"),
+        "test": os.path.join("dataset_4", "test"),
+        # "augment": False,
+        "source_url": "https://www.kaggle.com/datasets/mohnishsaiprasad/forest-fire-images"
+    },
 }
 
 default_cfg = {
     "train": DATASETS,
     "test": "test_combined",
-    "keras_models": [MobileNetV3Small],
+    "keras_models": [ResNet50V2, VGG19, MobileNetV3Small, DenseNet121],
     "custom_models": [WILDFIRENET],
     "hyperparameters": {
         "batch_size": 32,
