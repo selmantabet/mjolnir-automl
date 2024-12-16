@@ -87,7 +87,8 @@ def generators_to_dataset(generators, batch_size=32, img_height=224, img_width=2
     return dataset
 
 
-def show_counts_from_generators(generator, augmented_generator=None):
+def class_counts_from_generators(generator, augmented_generator=None):
+    print("--------------------")
     print("Number of samples in generator:", generator.samples)
     print("Number of classes:", generator.num_classes)
     print("--------------------")
@@ -119,6 +120,12 @@ def show_counts_from_generators(generator, augmented_generator=None):
         for class_name, count in augmented_class_counts.items():
             print(f"{class_name}: {count + original_class_counts[class_name]}")
     print("--------------------")
+
+    combined_class_counts = original_class_counts.copy()
+    for key in original_class_counts:
+        combined_class_counts[key] += augmented_class_counts[key]
+
+    return combined_class_counts
 
 
 def consolidate_to_train(datasets):
