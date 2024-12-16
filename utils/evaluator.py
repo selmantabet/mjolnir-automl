@@ -8,16 +8,10 @@ def full_eval(model_ds_dir, history, model, dataset_name, test_dataset, true_lab
     plot_history(model_ds_dir, history, model.name, dataset_name)
     # Plot the test images with predictions
     plot_test_images(test_dataset, model_ds_dir, dataset_name, model)
-    print(f"True labels: {true_labels}")
-    print(f"True labels shape: {true_labels.shape}")
 
     predicted_probs = model.predict(test_dataset, steps=steps)
-
-    print(f"Predicted probabilities: {predicted_probs}")
-    print(f"Predicted probabilities shape: {predicted_probs.shape}")
     predicted_labels = (predicted_probs >= 0.5).astype(int).flatten()
-    print(f"Predicted labels: {predicted_labels}")
-    print(f"Predicted labels shape: {predicted_labels.shape}")
+
     # Generate the confusion matrix using the default threshold of 0.5
     cm = confusion_matrix(true_labels, predicted_labels)
     plot_confusion_matrix(cm, model_ds_dir, model.name, dataset_name)
