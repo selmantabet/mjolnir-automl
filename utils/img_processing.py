@@ -6,14 +6,15 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
 
-def resize_and_compress_images(root_dir, target_size=(224, 224), quality=90):
+def enforce_image_params(root_dir, target_size=(224, 224), quality=90):
     for subdir, _, files in os.walk(root_dir):
         for file in files:
             if file.lower().endswith(('png', 'jpg', 'jpeg')):
                 file_path = os.path.join(subdir, file)
-                with Image.open(file_path) as img:
-                    img = img.resize(target_size, Image.LANCZOS)
-                    img.save(file_path, quality=quality, optimize=True)
+                with Image.open(file_path).convert('RGB') as img:
+                    if img.size != target_size:
+                        img = img.resize(target_size, Image.LANCZOS)
+                        img.save(file_path, quality=quality, optimize=True)
 
 
 def plot_images(directory, category, num_images, img_height=224, img_width=224):
