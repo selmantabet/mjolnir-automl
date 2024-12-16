@@ -24,11 +24,11 @@ DATASETS = {
 cfg = {
     "train": DATASETS,
     # "test": "test_combined",
-    "keras_models": [MobileNetV3Small],
+    "keras_models": [ResNet50V2, VGG19, MobileNetV3Small],
     "custom_models": [create_wildfire_model(224, 224)],
     "hyperparameters": {
         "batch_size": 32,
-        "epochs": 70,
+        "epochs": 5,
     },
     "optimizer": "adam",
     "loss": "binary_crossentropy",
