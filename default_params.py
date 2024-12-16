@@ -29,7 +29,7 @@ DATASETS = {
 default_cfg = {
     "train": DATASETS,
     "test": "test_combined",
-    "keras_models": [ResNet50V2, VGG19, MobileNetV3Small],
+    "keras_models": [MobileNetV3Small],
     "custom_models": [WILDFIRENET],
     "hyperparameters": {
         "batch_size": 32,

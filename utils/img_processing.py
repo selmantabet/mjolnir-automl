@@ -2,6 +2,8 @@ import os
 from PIL import Image
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import matplotlib.pyplot as plt
+# Switch to a non-interactive backend to allow for cmd line execution
+plt.switch_backend('agg')
 
 
 def resize_and_compress_images(root_dir, target_size=(224, 224), quality=90):
