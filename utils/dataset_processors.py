@@ -121,11 +121,11 @@ def class_counts_from_generators(generator, augmented_generator=None):
             print(f"{class_name}: {count + original_class_counts[class_name]}")
     print("--------------------")
 
-    combined_class_counts = original_class_counts.copy()
-    for key in original_class_counts:
-        combined_class_counts[key] += augmented_class_counts[key]
+    # combined_class_counts = original_class_counts.copy()
+    # for key in original_class_counts:
+    #     combined_class_counts[key] += augmented_class_counts[key]
 
-    return combined_class_counts
+    return original_class_counts
 
 
 def consolidate_to_train(datasets):
