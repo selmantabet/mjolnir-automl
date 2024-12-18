@@ -33,6 +33,3 @@ def create_wildfire_model(img_height=224, img_width=224):
     model.add(Dense(1, activation='sigmoid'))
     model.name = 'WildfireNet'
     return model
-
-
-WILDFIRENET = create_wildfire_model()

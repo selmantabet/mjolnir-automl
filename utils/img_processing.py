@@ -11,10 +11,14 @@ def enforce_image_params(root_dir, target_size=(224, 224), quality=90):
         for file in files:
             if file.lower().endswith(('png', 'jpg', 'jpeg')):
                 file_path = os.path.join(subdir, file)
-                with Image.open(file_path).convert('RGB') as img:
+                with Image.open(file_path) as img:
+                    if img.size == target_size and img.mode == 'RGB':
+                        continue
                     if img.size != target_size:
                         img = img.resize(target_size, Image.LANCZOS)
-                        img.save(file_path, quality=quality, optimize=True)
+                    if img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    img.save(file_path, quality=quality, optimize=True)
 
 
 def plot_images(directory, category, num_images, img_height=224, img_width=224):

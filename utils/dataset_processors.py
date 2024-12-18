@@ -1,8 +1,9 @@
-from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import matplotlib.pyplot as plt
 # Switch to a non-interactive backend to allow for cmd line execution
 plt.switch_backend('agg')
+
 # ImageDataGenerator for original images (no augmentation)
 original_datagen = ImageDataGenerator(rescale=1./255)
 

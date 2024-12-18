@@ -3,7 +3,7 @@ from keras.metrics import Precision, Recall, AUC
 from tensorflow.keras.applications import *
 from custom_metrics import f1_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from wildfirenet import WILDFIRENET
+from wildfirenet import create_wildfire_model
 
 DATASETS = {
     "The Wildfire Dataset": {
@@ -33,10 +33,10 @@ DATASETS = {
 }
 
 default_cfg = {
-    "train": DATASETS,
-    "test": "test_combined",
-    "keras_models": [ResNet50V2, VGG19, MobileNetV3Small, DenseNet121],
-    "custom_models": [WILDFIRENET],
+    "datasets": DATASETS,  # The datasets to use
+    "test": "test_combined",  # This overrides the test datasets stored under "datasets"
+    "keras_models": [ResNet50V2, VGG19, MobileNetV3Small, MobileNetV2, DenseNet121],
+    "custom_models": [create_wildfire_model(224, 224)],  # Custom models to use
     "hyperparameters": {
         "batch_size": 32,
         "epochs": 80,
@@ -45,13 +45,13 @@ default_cfg = {
     "loss": "binary_crossentropy",
     "image_width": 224,
     "image_height": 224,
-    "metrics": ['accuracy',
+    "metrics": ['accuracy',  # Metrics functions, directly handed to model.compile
                 Precision(name="precision"),
                 Recall(name="recall"),
                 AUC(name="auc"),
                 f1_score
                 ],
-    "callbacks": [
+    "callbacks": [  # Callback functions, directly handed to model.fit
         EarlyStopping(monitor='val_loss', patience=5,
                       restore_best_weights=True),
         ModelCheckpoint(filepath=os.path.join("tmp", 'temp_model.keras'),
@@ -59,6 +59,7 @@ default_cfg = {
         ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                           patience=5, verbose=1)
     ],
+    # If True, the image sizes and RGB colour mode will be enforced on all images
     "enforce_image_settings": False
 }
 
