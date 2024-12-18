@@ -4,6 +4,7 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import matplotlib.pyplot as plt
 # Switch to a non-interactive backend to allow for cmd line execution
 plt.switch_backend('agg')
+Image.MAX_IMAGE_PIXELS = None
 
 
 def enforce_image_params(root_dir, target_size=(224, 224), quality=90):
