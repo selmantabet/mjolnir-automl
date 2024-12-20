@@ -29,7 +29,7 @@ def create_wildfire_model(img_height=224, img_width=224):
     model.add(Dense(128, activation='relu'))
     model.add(BatchNormalization())
     model.add(Dropout(0.5))
-
+    # Sigmoid for binary classification
     model.add(Dense(1, activation='sigmoid'))
     model.name = 'WildfireNet'
     return model
