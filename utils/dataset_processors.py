@@ -40,14 +40,17 @@ def create_dataset(generator, batch_size=32, img_height=224, img_width=224):
     return dataset
 
 
+# Train is shuffled, so Val split should be random.
 def val_split(dataset, samples=None, val_size=0.2):
     # Calculate the number of samples for validation and training
     val_size = int(val_size * samples)
     train_size = samples - val_size
     # Print the sizes of the datasets
-    print("Splitted dataset:")
+    print("-------------------------")
+    print("--- Splitted dataset ---")
     print(f"Training dataset size: {train_size} samples")
     print(f"Validation dataset size: {val_size} samples")
+    print("-------------------------")
     val_dataset = dataset.take(val_size)
     train_dataset = dataset.skip(val_size)
     return train_dataset, val_dataset, train_size, val_size

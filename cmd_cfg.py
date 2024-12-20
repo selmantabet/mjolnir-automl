@@ -13,12 +13,12 @@ DATASETS = {
         # "augment": False,
         "source_url": "https://www.kaggle.com/datasets/elmadafri/the-wildfire-dataset/"
     },
-    "DeepFire": {
-        "train": os.path.join("datasets", "dataset_2", "Training"),
-        "test": os.path.join("datasets", "dataset_2", "Testing"),
-        # "augment": False,
-        "source_url": "https://www.kaggle.com/datasets/alik05/forest-fire-dataset/"
-    },
+    # "DeepFire": {
+    #     "train": os.path.join("datasets", "dataset_2", "Training"),
+    #     "test": os.path.join("datasets", "dataset_2", "Testing"),
+    #     # "augment": False,
+    #     "source_url": "https://www.kaggle.com/datasets/alik05/forest-fire-dataset/"
+    # },
     # "FIRE": {
     #     "train": os.path.join("datasets", "dataset_3"),
     #     # "augment": False,
@@ -35,11 +35,12 @@ DATASETS = {
 cfg = {
     "datasets": DATASETS,
     # "test": "test_combined",
+    "val_size": 0.2,  # The size of the validation dataset if splitting is needed
     "keras_models": [MobileNetV3Small],
     # "custom_models": [create_wildfire_model(224, 224)],
     "hyperparameters": {
         "batch_size": 32,
-        "epochs": 70,
+        "epochs": 80,
     },
     "optimizer": "adam",
     "loss": "binary_crossentropy",
