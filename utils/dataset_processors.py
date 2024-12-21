@@ -20,6 +20,25 @@ augmented_datagen = ImageDataGenerator(
 )
 
 
+def create_split_datagen(val_size=0.2):
+    # Create the ImageDataGenerator for the original dataset
+    original_datagen = ImageDataGenerator(
+        rescale=1./255, validation_split=val_size)
+    # Create the ImageDataGenerator for the augmented dataset
+    augmented_datagen = ImageDataGenerator(
+        rescale=1./255,
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        fill_mode='nearest',
+        validation_split=val_size
+    )
+    return original_datagen, augmented_datagen
+
+
 def samples_from_generators(generators):
     samples = 0
     for generator in generators:
@@ -38,22 +57,6 @@ def create_dataset(generator, batch_size=32, img_height=224, img_width=224):
     )
     dataset = dataset.unbatch().batch(batch_size).prefetch(tf.data.AUTOTUNE)
     return dataset
-
-
-# Train is shuffled, so Val split should be random.
-def val_split(dataset, samples=None, val_size=0.2):
-    # Calculate the number of samples for validation and training
-    val_size = int(val_size * samples)
-    train_size = samples - val_size
-    # Print the sizes of the datasets
-    print("-------------------------")
-    print("--- Splitted dataset ---")
-    print(f"Training dataset size: {train_size} samples")
-    print(f"Validation dataset size: {val_size} samples")
-    print("-------------------------")
-    val_dataset = dataset.take(val_size)
-    train_dataset = dataset.skip(val_size)
-    return train_dataset, val_dataset, train_size, val_size
 
 
 def create_generators(directory, batch_size=32, img_height=224, img_width=224, augment=True, shuffle=True):
@@ -76,6 +79,49 @@ def create_generators(directory, batch_size=32, img_height=224, img_width=224, a
         )
         return generator, augmented_generator
     return generator, None
+
+
+def create_split_generators(directory, val_size=0.2, batch_size=32, img_height=224, img_width=224, augment=True, shuffle=True):
+    original_datagen, augmented_datagen = create_split_datagen(val_size)
+    generator = original_datagen.flow_from_directory(
+        directory,
+        target_size=(img_height, img_width),
+        batch_size=batch_size,
+        class_mode='binary',
+        color_mode='rgb',
+        shuffle=shuffle,
+        subset='training'
+    )
+    val_generator = original_datagen.flow_from_directory(
+        directory,
+        target_size=(img_height, img_width),
+        batch_size=batch_size,
+        class_mode='binary',
+        color_mode='rgb',
+        shuffle=shuffle,
+        subset='validation'
+    )
+    if augment:
+        augmented_generator = augmented_datagen.flow_from_directory(
+            directory,
+            target_size=(img_height, img_width),
+            batch_size=batch_size,
+            class_mode='binary',
+            color_mode='rgb',
+            shuffle=shuffle,
+            subset='training'
+        )
+        augmented_val_generator = augmented_datagen.flow_from_directory(
+            directory,
+            target_size=(img_height, img_width),
+            batch_size=batch_size,
+            class_mode='binary',
+            color_mode='rgb',
+            shuffle=shuffle,
+            subset='validation'
+        )
+        return generator, augmented_generator, val_generator, augmented_val_generator
+    return generator, None, val_generator, None
 
 
 def generators_to_dataset(generators, batch_size=32, img_height=224, img_width=224):
