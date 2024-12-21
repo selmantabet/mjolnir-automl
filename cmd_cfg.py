@@ -3,6 +3,7 @@ from keras.metrics import Precision, Recall, AUC
 from tensorflow.keras.applications import *
 from custom_metrics import f1_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+# WildfireNet model, for comparison to other SOTA models in dissertation.
 from wildfirenet import create_wildfire_model
 
 DATASETS = {

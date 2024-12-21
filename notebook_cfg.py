@@ -3,6 +3,7 @@ from keras.metrics import Precision, Recall, AUC
 from tensorflow.keras.applications import *
 from custom_metrics import f1_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+# WildfireNet model, for comparison to other SOTA models in dissertation.
 from wildfirenet import create_wildfire_model
 
 DATASETS = {
@@ -35,9 +36,9 @@ DATASETS = {
 default_cfg = {
     "datasets": DATASETS,  # The datasets to use
     # This overrides the test datasets stored under "datasets"
-    "test": os.path.join("datasets", "dataset_4", "train"),
+    "test": os.path.join("datasets", "d4_test"),
     "val_size": 0.2,  # The size of the validation dataset if splitting is needed
-    "keras_models": [VGG19, MobileNetV3Small, MobileNetV2, DenseNet121],
+    "keras_models": [MobileNetV3Small, MobileNetV2, VGG19, ResNet50V2, Xception, DenseNet121],
     "custom_models": [create_wildfire_model(224, 224)],  # Custom models to use
     "hyperparameters": {
         "batch_size": 32,
