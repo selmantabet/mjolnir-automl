@@ -60,7 +60,7 @@ default_cfg = {
         ModelCheckpoint(filepath=os.path.join("tmp", 'temp_model.keras'),
                         monitor='val_loss', save_best_only=True),
         ReduceLROnPlateau(monitor='val_loss', factor=0.5,
-                          patience=5, verbose=1)
+                          patience=3, verbose=1)
     ],
     # If True, the image sizes and RGB colour mode will be enforced on all images
     "enforce_image_settings": True

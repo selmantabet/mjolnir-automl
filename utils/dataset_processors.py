@@ -59,17 +59,9 @@ def create_dataset(generator, batch_size=32, img_height=224, img_width=224):
     return dataset
 
 
-def create_generators(directory, batch_size=32, img_height=224, img_width=224, augment=True, shuffle=True):
-    generator = original_datagen.flow_from_directory(
-        directory,
-        target_size=(img_height, img_width),
-        batch_size=batch_size,
-        class_mode='binary',
-        color_mode='rgb',
-        shuffle=shuffle
-    )
+def create_generator(directory, batch_size=32, img_height=224, img_width=224, augment=True, shuffle=True):
     if augment:
-        augmented_generator = augmented_datagen.flow_from_directory(
+        generator = augmented_datagen.flow_from_directory(
             directory,
             target_size=(img_height, img_width),
             batch_size=batch_size,
@@ -77,32 +69,24 @@ def create_generators(directory, batch_size=32, img_height=224, img_width=224, a
             color_mode='rgb',
             shuffle=shuffle
         )
-        return generator, augmented_generator
-    return generator, None
+        return generator
+    else:
+        generator = original_datagen.flow_from_directory(
+            directory,
+            target_size=(img_height, img_width),
+            batch_size=batch_size,
+            class_mode='binary',
+            color_mode='rgb',
+            shuffle=shuffle
+        )
+        return generator
 
 
 def create_split_generators(directory, val_size=0.2, batch_size=32, img_height=224, img_width=224, augment=True, shuffle=True):
     original_datagen, augmented_datagen = create_split_datagen(val_size)
-    generator = original_datagen.flow_from_directory(
-        directory,
-        target_size=(img_height, img_width),
-        batch_size=batch_size,
-        class_mode='binary',
-        color_mode='rgb',
-        shuffle=shuffle,
-        subset='training'
-    )
-    val_generator = original_datagen.flow_from_directory(
-        directory,
-        target_size=(img_height, img_width),
-        batch_size=batch_size,
-        class_mode='binary',
-        color_mode='rgb',
-        shuffle=shuffle,
-        subset='validation'
-    )
-    if augment:
-        augmented_generator = augmented_datagen.flow_from_directory(
+
+    def generator_from_datagen(datagen):
+        original = datagen.flow_from_directory(
             directory,
             target_size=(img_height, img_width),
             batch_size=batch_size,
@@ -111,17 +95,21 @@ def create_split_generators(directory, val_size=0.2, batch_size=32, img_height=2
             shuffle=shuffle,
             subset='training'
         )
-        augmented_val_generator = augmented_datagen.flow_from_directory(
+        val = original_datagen.flow_from_directory(
             directory,
             target_size=(img_height, img_width),
             batch_size=batch_size,
             class_mode='binary',
             color_mode='rgb',
-            shuffle=shuffle,
+            shuffle=False,
             subset='validation'
         )
-        return generator, augmented_generator, val_generator, augmented_val_generator
-    return generator, None, val_generator, None
+        return original, val
+
+    if augment:
+        return generator_from_datagen(augmented_datagen)
+    else:
+        return generator_from_datagen(original_datagen)
 
 
 def generators_to_dataset(generators, batch_size=32, img_height=224, img_width=224):
@@ -137,7 +125,7 @@ def generators_to_dataset(generators, batch_size=32, img_height=224, img_width=2
     return dataset
 
 
-def class_counts_from_generators(generator, augmented_generator=None):
+def class_counts_from_generator(generator):
     print("--------------------")
     print("Number of samples in generator:", generator.samples)
     print("Number of classes:", generator.num_classes)
@@ -147,35 +135,19 @@ def class_counts_from_generators(generator, augmented_generator=None):
     class_names = list(class_indices.keys())
     print("Class names:", class_names)
 
-    original_class_counts = {class_name: 0 for class_name in class_names}
-    augmented_class_counts = {class_name: 0 for class_name in class_names}
+    class_counts = {class_name: 0 for class_name in class_names}
 
     for class_name, class_index in class_indices.items():
-        original_class_counts[class_name] = sum(
+        class_counts[class_name] = sum(
             generator.classes == class_index)
-        if augmented_generator is not None:
-            augmented_class_counts[class_name] = sum(
-                augmented_generator.classes == class_index)
 
     # Print the results
     print("Dataset Class Counts:")
-    for class_name, count in original_class_counts.items():
+    for class_name, count in class_counts.items():
         print(f"{class_name}: {count}")
-    if augmented_generator is not None:
-        print("\nAugmented Dataset Class Counts:")
-        for class_name, count in augmented_class_counts.items():
-            print(f"{class_name}: {count}")
-        print("\n")
-        print("Combined Dataset Class Counts:")
-        for class_name, count in augmented_class_counts.items():
-            print(f"{class_name}: {count + original_class_counts[class_name]}")
     print("--------------------")
 
-    # combined_class_counts = original_class_counts.copy()
-    # for key in original_class_counts:
-    #     combined_class_counts[key] += augmented_class_counts[key]
-
-    return original_class_counts
+    return class_counts
 
 
 def consolidate_to_train(datasets):

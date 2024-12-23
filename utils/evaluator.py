@@ -1,17 +1,19 @@
 from .plot_functions import *
 from sklearn.metrics import confusion_matrix
+import numpy as np
+from .dataset_processors import generators_to_dataset
 
 
-def full_eval(model_ds_dir, history, model, dataset_name, test_dataset, true_labels, steps):
+def full_eval(model_ds_dir, history, model, dataset_name, test_generators):
     print(f"Evaluating {model.name} on {dataset_name}...")
     # Plot metrics and save the history
     plot_history(model_ds_dir, history, model.name, dataset_name)
     # Plot the test images with predictions
+
+    true_labels, predicted_labels, predicted_probs = get_labels_and_predictions(
+        test_generators, model)
+    test_dataset = generators_to_dataset(test_generators)
     plot_test_images(test_dataset, model_ds_dir, dataset_name, model)
-
-    predicted_probs = model.predict(test_dataset, steps=steps)
-    predicted_labels = (predicted_probs >= 0.5).astype(int).flatten()
-
     # Generate the confusion matrix using the default threshold of 0.5
     cm = confusion_matrix(true_labels, predicted_labels)
     plot_confusion_matrix(cm, model_ds_dir, model.name, dataset_name)
@@ -38,6 +40,21 @@ def full_eval(model_ds_dir, history, model, dataset_name, test_dataset, true_lab
                           model.name, dataset_name, optimal=True)
 
     return optimal_threshold
+
+
+def get_labels_and_predictions(generators, model):
+    true_labels = []
+    predictions = []
+    probabilities = []
+    for generator in generators:
+        for _ in range(len(generator)):
+            X, y = next(generator)
+            preds = model.predict(X)
+            probabilities.extend(preds.flatten())
+            preds = (preds >= 0.5).astype(np.float32).flatten()
+            true_labels.extend(y)
+            predictions.extend(preds)
+    return np.array(true_labels), np.array(predictions), np.array(probabilities)
 
 
 def extract_evaluation_data(data):

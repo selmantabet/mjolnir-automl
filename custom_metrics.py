@@ -1,7 +1,8 @@
 import tensorflow.keras.backend as K
 from keras.saving import register_keras_serializable
 
-# F1 score metric function modified from a GPT-4o example.
+# F1 score metric function modified from a GPT-4o response.
+# Prompt: "Create a custom F1 score metric function for binary image classification in Keras."
 
 
 @register_keras_serializable()
