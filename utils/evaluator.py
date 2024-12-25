@@ -110,6 +110,8 @@ def plot_time_extrapolation(df, dir):
     num_distinct_models = df['Model'].nunique()
     print(f"Number of Distinct Models: {num_distinct_models}")
     num_singular_datasets = df['Dataset'].apply(lambda x: '_' not in x).sum()
+    num_singular_datasets = df[df['Dataset'].apply(
+        lambda x: '_' not in x)]['Dataset'].nunique()
     print(f"Number of Singular Datasets: {num_singular_datasets}")
     # Define the range of models and datasets
     # Number of models from 1 to 10
