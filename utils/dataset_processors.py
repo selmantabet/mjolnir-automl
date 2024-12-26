@@ -20,6 +20,13 @@ augmented_datagen = ImageDataGenerator(
 )
 
 
+def reset_all_generators(generators):
+    for generator in generators:
+        if generator is not None:
+            generator.reset()
+    return generators
+
+
 def create_split_datagen(val_size=0.2):
     # Create the ImageDataGenerator for the original dataset
     original_datagen = ImageDataGenerator(
@@ -80,6 +87,15 @@ def create_generator(directory, batch_size=32, img_height=224, img_width=224, au
             shuffle=shuffle
         )
         return generator
+
+
+def class_weights_from_counts(class_counts, class_indices):
+    total = sum(class_counts.values())
+    weights = {class_name: total / (len(class_counts) * count)
+               for class_name, count in class_counts.items()}
+    weights = {class_indices[class_name]: weight
+               for class_name, weight in weights.items()}
+    return weights
 
 
 def create_split_generators(directory, val_size=0.2, batch_size=32, img_height=224, img_width=224, augment=True, shuffle=True):

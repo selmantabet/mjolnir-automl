@@ -19,12 +19,12 @@ def full_eval(model_ds_dir, history, model, dataset_name, test_generators):
     plot_confusion_matrix(cm, model_ds_dir, model.name, dataset_name)
 
     # Generate the PR curve
-    plot_pr_curve(model.name, true_labels, predicted_probs,
-                  model_ds_dir, dataset_name)
+    optimal_threshold = plot_pr_curve(model.name, true_labels, predicted_probs,
+                                      model_ds_dir, dataset_name)
 
     # Generate the ROC curve
-    optimal_threshold = generate_roc_curve(
-        model.name, true_labels, predicted_probs, model_ds_dir, dataset_name)
+    plot_roc_curve(model.name, true_labels, predicted_probs,
+                   model_ds_dir, dataset_name)
 
     # Plot test images with optimal threshold
     plot_test_images(test_dataset, model_ds_dir, dataset_name,
@@ -42,7 +42,7 @@ def full_eval(model_ds_dir, history, model, dataset_name, test_generators):
     return optimal_threshold
 
 
-def get_labels_and_predictions(generators, model):
+def get_labels_and_predictions(generators, model, threshold=0.5):
     true_labels = []
     predictions = []
     probabilities = []
@@ -51,7 +51,7 @@ def get_labels_and_predictions(generators, model):
             X, y = next(generator)
             preds = model.predict(X)
             probabilities.extend(preds.flatten())
-            preds = (preds >= 0.5).astype(np.float32).flatten()
+            preds = (preds >= threshold).astype(np.float32).flatten()
             true_labels.extend(y)
             predictions.extend(preds)
     return np.array(true_labels), np.array(predictions), np.array(probabilities)
@@ -66,17 +66,54 @@ def extract_evaluation_data(data):
                 "Dataset": dataset_name,
                 "Train Size": metrics.get("train_dataset_size"),
                 "Val Size": metrics.get("val_dataset_size"),
-                "Evaluation Accuracy": metrics["evaluation"]["accuracy"] if "evaluation" in metrics else None,
-                "Evaluation Loss": metrics["evaluation"]["loss"] if "evaluation" in metrics else None,
-                "Evaluation AUC": metrics["evaluation"]["auc"] if "evaluation" in metrics else None,
-                "Evaluation Precision": metrics["evaluation"]["precision"] if "evaluation" in metrics else None,
-                "Evaluation Recall": metrics["evaluation"]["recall"] if "evaluation" in metrics else None,
-                "Evaluation F1 Score": metrics["evaluation"]["f1_score"] if "evaluation" in metrics else None,
                 "Training Time": metrics.get("training_time"),
                 "Optimal Threshold": metrics.get("optimal_threshold")
             }
+            evaluation_metrics = metrics.get("evaluation")
+            for metric, value in evaluation_metrics.items():
+                row[metric] = value
             rows.append(row)
     return rows
+
+
+def plot_dataset_sizes(df, dir):
+    # Set plot style
+    sns.set_theme(style="whitegrid")
+
+    # Create a bar plot for Dataset Sizes
+    plt.figure(figsize=(14, 8))
+    plot = sns.barplot(
+        data=df,
+        x="Dataset",
+        y="Train Size",
+        palette="viridis"
+    )
+
+    # Customize the plot
+    plot.set_title("Dataset Sizes")
+    plot.set_ylabel("Train Size")
+    plot.set_xlabel("Dataset")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.savefig(os.path.join(dir, "train_dataset_sizes.png"))
+
+    plt.figure(figsize=(14, 8))
+    plot = sns.barplot(
+        data=df,
+        x="Dataset",
+        y="Val Size",
+        palette="viridis"
+    )
+
+    # Customize the plot
+    plot.set_title("Validation Dataset Sizes")
+    plot.set_ylabel("Val Size")
+    plot.set_xlabel("Dataset")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.savefig(os.path.join(dir, "val_dataset_sizes.png"))
 
 
 def plot_metric_chart(df, metric, dir):
@@ -93,11 +130,32 @@ def plot_metric_chart(df, metric, dir):
         palette="viridis"
     )
 
+    # Highlight the highest bar in the entire chart
+    max_value = df[metric].max()
+    max_index = df[df[metric] == max_value].index[0]
+    for patch in plot.patches:
+        if patch.get_height() == max_value:
+            patch.set_edgecolor('red')
+            patch.set_linewidth(3)
+            # # Add the value number on top of the highest bar
+            # height = patch.get_height()
+            # plot.text(
+            #     patch.get_x() + patch.get_width() / 2.,
+            #     height,
+            #     f'{height:.2f}',
+            #     ha="center",
+            #     va="bottom",
+            #     fontsize=12,
+            #     color='red',
+            #     weight='bold'
+            # )
     # Customize the plot
     plot.set_title(f"Model Performance Comparison ({metric})")
     plot.set_ylabel(metric)
     plot.set_xlabel("Model")
     plt.xticks(rotation=45)
+    plt.figtext(0.99, 0.01, "The highlighted bar with the red outline is the highest one",
+                horizontalalignment='right', fontsize=10, color='red')
     plt.legend(title="Dataset")
     plt.tight_layout()
 
@@ -109,7 +167,6 @@ def plot_time_extrapolation(df, dir):
     print(f"Average Training Time: {average_training_time}")
     num_distinct_models = df['Model'].nunique()
     print(f"Number of Distinct Models: {num_distinct_models}")
-    num_singular_datasets = df['Dataset'].apply(lambda x: '_' not in x).sum()
     num_singular_datasets = df[df['Dataset'].apply(
         lambda x: '_' not in x)]['Dataset'].nunique()
     print(f"Number of Singular Datasets: {num_singular_datasets}")

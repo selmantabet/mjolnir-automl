@@ -9,7 +9,7 @@ from sklearn.metrics import roc_curve, auc, precision_recall_curve
 plt.switch_backend('agg')
 
 
-def generate_roc_curve(model_name, labels, predictions, directory, dataset_name):
+def plot_roc_curve(model_name, labels, predictions, directory, dataset_name):
     # Generate predictions on the validation set
 
     # Calculate ROC curve and AUC
@@ -56,6 +56,11 @@ def plot_pr_curve(model_name, labels, predictions, directory, dataset_name):
     precision, recall, thresholds = precision_recall_curve(
         labels, predictions)
 
+    # Optimizing based on max F1 score
+    f1_scores = 2 * (precision * recall) / (precision + recall)
+    optimal_idx = np.argmax(f1_scores)
+    optimal_threshold = thresholds[optimal_idx]
+
     # Plot PR curve
     plt.figure()
     plt.plot(recall, precision, label='PR Curve')
@@ -66,6 +71,8 @@ def plot_pr_curve(model_name, labels, predictions, directory, dataset_name):
     plt.savefig(os.path.join(directory, f'pr_curve_{
                 model_name}_{dataset_name}.png'))
     plt.close()
+
+    return optimal_threshold
 
 # Function to plot and save training history
 
