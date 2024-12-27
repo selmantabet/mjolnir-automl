@@ -2,6 +2,7 @@ from .plot_functions import *
 from sklearn.metrics import confusion_matrix
 import numpy as np
 from .dataset_processors import generators_to_dataset
+import json
 
 
 def full_evaluation(model_ds_dir, history, model, dataset_name, test_generators):
@@ -32,7 +33,7 @@ def full_evaluation(model_ds_dir, history, model, dataset_name, test_generators)
 
     # Generate predictions with optimal threshold
     predicted_labels_optimal = (
-        predicted_probs >= optimal_threshold).astype(int).flatten()
+        predicted_probs >= optimal_threshold).astype(np.float32).flatten()
 
     # Generate the confusion matrix using the optimal threshold
     cm_optimal = confusion_matrix(true_labels, predicted_labels_optimal)
@@ -57,6 +58,90 @@ def get_labels_and_predictions(generators, model, threshold=0.5):
     return np.array(true_labels), np.array(predictions), np.array(probabilities)
 
 
+def plot_sum_of_metrics_heatmaps(eval_dir, df, metric_weights=None):
+    # Drop irrelevant columns
+    df = df.drop(columns=['Train Size', 'Val Size', 'Training Time',
+                 'Optimal Threshold', 'Train Counts', 'Val Counts'])
+    if metric_weights is None:
+        metric_weights = {}
+
+    # Ensure metric_weights keys are lowercase
+    metric_weights = {k.lower(): v for k, v in metric_weights.items()}
+
+    # Normalize each metric in the dataframe using min-max normalization
+    for metric in metric_weights.keys():
+        if metric in df.columns.str.lower():
+            df[metric] = (df[metric] - df[metric].min()) / \
+                (df[metric].max() - df[metric].min())
+
+    # Group by Dataset-Model pairs
+    grouped = df.groupby(['Dataset', 'Model'])
+
+    # Initialize an empty DataFrame to store the results
+    results = []
+
+    for (dataset, model), group in grouped:
+        weighted_sum = 0
+        for metric, weight in metric_weights.items():
+            if metric in group.columns.str.lower():
+                weighted_sum += group[metric].sum() * weight
+            else:
+                print(f"Metric '{metric}' not found in DataFrame, skipping...")
+        results.append({
+            'Dataset': dataset,
+            'Model': model,
+            'Weighted Sum': weighted_sum
+        })
+
+    # Convert results to DataFrame
+    results_df = pd.DataFrame(results)
+
+    # Plot heatmap
+    plt.figure(figsize=(23, 14))
+    heatmap_data = results_df.pivot(
+        index='Dataset', columns='Model', values='Weighted Sum')
+    sns.heatmap(heatmap_data, annot=True, fmt=".2f", cmap='RdYlGn')
+    plt.title('Weighted Sum of Metrics Heatmap',
+              fontsize=26, fontweight='bold')
+    plt.savefig(os.path.join(eval_dir, "weighted_sum_of_metrics_heatmap.png"))
+
+    # Calculate the unweighted sum of metrics
+    for metric in df.columns:
+        # Normalization and assuming every other column is a metric
+        if metric.lower() not in ['dataset', 'model']:
+            df[metric] = (df[metric] - df[metric].min()) / \
+                (df[metric].max() - df[metric].min())
+
+    # Group by 'Dataset' and 'Model'
+    grouped = df.groupby(['Dataset', 'Model'])
+
+    # Initialize an empty DataFrame to store the results
+    results = []
+
+    for (dataset, model), group in grouped:
+        unweighted_sum = group.drop(
+            # Sum of all metrics
+            columns=['Dataset', 'Model']).sum(axis=1).sum()
+        results.append({
+            'Dataset': dataset,
+            'Model': model,
+            'Unweighted Sum': unweighted_sum
+        })
+
+    # Convert results to DataFrame
+    results_df = pd.DataFrame(results)
+
+    # Plot heatmap
+    plt.figure(figsize=(23, 14))
+    heatmap_data = results_df.pivot(
+        index='Dataset', columns='Model', values='Unweighted Sum')
+    sns.heatmap(heatmap_data, annot=True, fmt=".2f", cmap='RdYlGn')
+    plt.title('Unweighted Sum of Metrics Heatmap',
+              fontsize=26, fontweight='bold')
+    plt.savefig(os.path.join(
+        eval_dir, "unweighted_sum_of_metrics_heatmap.png"))
+
+
 def extract_evaluation_data(data):
     rows = []
     for model_name, datasets in data.items():
@@ -68,8 +153,8 @@ def extract_evaluation_data(data):
                 "Val Size": metrics.get("val_dataset_size"),
                 "Training Time": metrics.get("training_time"),
                 "Optimal Threshold": metrics.get("optimal_threshold"),
-                "Train Counts": metrics.get("train_counts"),
-                "Val Counts": metrics.get("val_counts"),
+                "Train Counts": json.dumps(metrics.get("train_counts")),
+                "Val Counts": json.dumps(metrics.get("val_counts")),
             }
             evaluation_metrics = metrics.get("evaluation")
             for metric, value in evaluation_metrics.items():
@@ -117,50 +202,46 @@ def plot_dataset_sizes(df, dir):
 
     plt.savefig(os.path.join(dir, "val_dataset_sizes.png"))
 
-    # Create a bar plot for Dataset Sizes
-    plt.figure(figsize=(14, 8))
-    train_counts = df['Train Counts'].apply(pd.Series).fillna(0)
-    train_counts['Dataset'] = df['Dataset']
-    train_counts = train_counts.melt(
-        id_vars=['Dataset'], var_name='Class', value_name='Count')
-    plot = sns.barplot(
-        data=train_counts,
-        x="Dataset",
-        y="Count",
-        hue="Class",
-        palette="viridis"
-    )
+    # Create two bar plots showing each dataset's class counts for train and val
+    train_data = []
+    val_data = []
 
-    # Customize the plot
-    plot.set_title("Train Dataset Sizes by Class")
-    plot.set_ylabel("Train Size")
-    plot.set_xlabel("Dataset")
+    # Collect train and val counts
+    for i, row in df.iterrows():
+        dataset_name = row['Dataset']
+        train_counts_str = row.get('Train Counts', '')
+        train_counts_dict = json.loads(
+            train_counts_str) if train_counts_str else {}
+        val_counts_str = row.get('Val Counts', '')
+        val_counts_dict = json.loads(val_counts_str) if val_counts_str else {}
+        for class_name, count in train_counts_dict.items():
+            train_data.append(
+                {'Dataset': dataset_name, 'Class': class_name, 'Count': count})
+        for class_name, count in val_counts_dict.items():
+            val_data.append(
+                {'Dataset': dataset_name, 'Class': class_name, 'Count': count})
+
+    # Convert to DataFrame
+    train_df = pd.DataFrame(train_data)
+    val_df = pd.DataFrame(val_data)
+
+    # Plot train counts
+    plt.figure(figsize=(12, 6))
+    sns.barplot(data=train_df, x='Dataset', y='Count',
+                hue='Class', palette='viridis')
+    plt.title("Training sample sizes per class for each dataset")
     plt.xticks(rotation=45)
     plt.tight_layout()
+    plt.savefig(os.path.join(dir, "train_class_counts.png"))
 
-    plt.savefig(os.path.join(dir, "train_dataset_sizes_by_class.png"))
-
-    plt.figure(figsize=(14, 8))
-    val_counts = df['Val Counts'].apply(pd.Series).fillna(0)
-    val_counts['Dataset'] = df['Dataset']
-    val_counts = val_counts.melt(
-        id_vars=['Dataset'], var_name='Class', value_name='Count')
-    plot = sns.barplot(
-        data=val_counts,
-        x="Dataset",
-        y="Count",
-        hue="Class",
-        palette="viridis"
-    )
-
-    # Customize the plot
-    plot.set_title("Validation Dataset Sizes by Class")
-    plot.set_ylabel("Val Size")
-    plot.set_xlabel("Dataset")
+    # Plot val counts
+    plt.figure(figsize=(12, 6))
+    sns.barplot(data=val_df, x='Dataset', y='Count',
+                hue='Class', palette='viridis')
+    plt.title("Validation sample sizes per class for each dataset")
     plt.xticks(rotation=45)
     plt.tight_layout()
-
-    plt.savefig(os.path.join(dir, "val_dataset_sizes_by_class.png"))
+    plt.savefig(os.path.join(dir, "val_class_counts.png"))
 
 
 def plot_metric_chart(df, metric, dir, highlight_max=True):
