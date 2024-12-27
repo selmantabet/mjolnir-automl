@@ -24,7 +24,8 @@ def plot_roc_curve(model_name, labels, predictions, directory, dataset_name):
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
+    plt.title(f'Receiver Operating Characteristic for {
+              model_name} on {dataset_name}')
     plt.legend(loc="lower right")
     plt.savefig(os.path.join(directory, f'roc_curve_{
                 model_name}_{dataset_name}.png'))
@@ -44,7 +45,11 @@ def plot_confusion_matrix(cm, directory, model_name, dataset_name, optimal=False
                 xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted labels')
     plt.ylabel('True labels')
-    plt.title('Confusion Matrix')
+    if optimal:
+        plt.title(f'Optimal Confusion Matrix for {
+                  model_name} on {dataset_name}')
+    else:
+        plt.title(f'Confusion Matrix for {model_name} on {dataset_name}')
     fname = f'confusion_matrix_{model_name}_{
         dataset_name}_optimal.png' if optimal else f'confusion_matrix_{model_name}_{dataset_name}.png'
     plt.savefig(os.path.join(directory, fname))
@@ -66,7 +71,9 @@ def plot_pr_curve(model_name, labels, predictions, directory, dataset_name):
     plt.plot(recall, precision, label='PR Curve')
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.title('Precision-Recall Curve')
+    plt.title(f'Precision-Recall Curve for {model_name} on {dataset_name}')
+    plt.axhline(y=optimal_threshold, color='r', linestyle='--',
+                label=f'Optimal Threshold: {optimal_threshold:.2f}')
     plt.legend(loc="lower right")
     plt.savefig(os.path.join(directory, f'pr_curve_{
                 model_name}_{dataset_name}.png'))
@@ -100,14 +107,16 @@ def plot_history(run_dir, history, model_name, dataset_name):
     plt.subplot(2, 1, 1)
     plt.plot(epochs, acc, label='Training Accuracy')
     plt.plot(epochs, val_acc, label='Validation Accuracy')
-    plt.title('Training and Validation Accuracy')
+    plt.title(f'Training and Validation Accuracy for {
+              model_name} on {dataset_name}')
     plt.legend()
 
     # Plot loss
     plt.subplot(2, 1, 2)
     plt.plot(epochs, loss, label='Training Loss')
     plt.plot(epochs, val_loss, label='Validation Loss')
-    plt.title('Training and Validation Loss')
+    plt.title(f'Training and Validation Loss for {
+              model_name} on {dataset_name}')
     plt.legend()
 
     plt.savefig(os.path.join(run_dir, f"loss_accuracy_{
@@ -129,21 +138,24 @@ def plot_history(run_dir, history, model_name, dataset_name):
     plt.subplot(3, 1, 1)
     plt.plot(epochs, recall, label='Training Recall')
     plt.plot(epochs, val_recall, label='Validation Recall')
-    plt.title('Training and Validation Recall')
+    plt.title(f'Training and Validation Recall for {
+              model_name} on {dataset_name}')
     plt.legend()
 
     # Plot F1 score
     plt.subplot(3, 1, 2)
     plt.plot(epochs, f1, label='Training F1 Score')
     plt.plot(epochs, val_f1, label='Validation F1 Score')
-    plt.title('Training and Validation F1 Score')
+    plt.title(f'Training and Validation F1 Score for {
+              model_name} on {dataset_name}')
     plt.legend()
 
     # Plot precision
     plt.subplot(3, 1, 3)
     plt.plot(epochs, precision, label='Training Precision')
     plt.plot(epochs, val_precision, label='Validation Precision')
-    plt.title('Training and Validation Precision')
+    plt.title(f'Training and Validation Precision for {
+              model_name} on {dataset_name}')
     plt.legend()
 
     plt.savefig(os.path.join(run_dir, f"recall_f1_precision_{

@@ -4,7 +4,7 @@ import numpy as np
 from .dataset_processors import generators_to_dataset
 
 
-def full_eval(model_ds_dir, history, model, dataset_name, test_generators):
+def full_evaluation(model_ds_dir, history, model, dataset_name, test_generators):
     print(f"Evaluating {model.name} on {dataset_name}...")
     # Plot metrics and save the history
     plot_history(model_ds_dir, history, model.name, dataset_name)
@@ -67,7 +67,9 @@ def extract_evaluation_data(data):
                 "Train Size": metrics.get("train_dataset_size"),
                 "Val Size": metrics.get("val_dataset_size"),
                 "Training Time": metrics.get("training_time"),
-                "Optimal Threshold": metrics.get("optimal_threshold")
+                "Optimal Threshold": metrics.get("optimal_threshold"),
+                "Train Counts": metrics.get("train_counts"),
+                "Val Counts": metrics.get("val_counts"),
             }
             evaluation_metrics = metrics.get("evaluation")
             for metric, value in evaluation_metrics.items():
@@ -115,8 +117,53 @@ def plot_dataset_sizes(df, dir):
 
     plt.savefig(os.path.join(dir, "val_dataset_sizes.png"))
 
+    # Create a bar plot for Dataset Sizes
+    plt.figure(figsize=(14, 8))
+    train_counts = df['Train Counts'].apply(pd.Series).fillna(0)
+    train_counts['Dataset'] = df['Dataset']
+    train_counts = train_counts.melt(
+        id_vars=['Dataset'], var_name='Class', value_name='Count')
+    plot = sns.barplot(
+        data=train_counts,
+        x="Dataset",
+        y="Count",
+        hue="Class",
+        palette="viridis"
+    )
 
-def plot_metric_chart(df, metric, dir):
+    # Customize the plot
+    plot.set_title("Train Dataset Sizes by Class")
+    plot.set_ylabel("Train Size")
+    plot.set_xlabel("Dataset")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.savefig(os.path.join(dir, "train_dataset_sizes_by_class.png"))
+
+    plt.figure(figsize=(14, 8))
+    val_counts = df['Val Counts'].apply(pd.Series).fillna(0)
+    val_counts['Dataset'] = df['Dataset']
+    val_counts = val_counts.melt(
+        id_vars=['Dataset'], var_name='Class', value_name='Count')
+    plot = sns.barplot(
+        data=val_counts,
+        x="Dataset",
+        y="Count",
+        hue="Class",
+        palette="viridis"
+    )
+
+    # Customize the plot
+    plot.set_title("Validation Dataset Sizes by Class")
+    plot.set_ylabel("Val Size")
+    plot.set_xlabel("Dataset")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.savefig(os.path.join(dir, "val_dataset_sizes_by_class.png"))
+
+
+def plot_metric_chart(df, metric, dir, highlight_max=True):
     # Set plot style
     sns.set_theme(style="whitegrid")
 
@@ -129,32 +176,25 @@ def plot_metric_chart(df, metric, dir):
         hue="Dataset",
         palette="viridis"
     )
-
-    # Highlight the highest bar in the entire chart
-    max_value = df[metric].max()
-    max_index = df[df[metric] == max_value].index[0]
-    for patch in plot.patches:
-        if patch.get_height() == max_value:
-            patch.set_edgecolor('red')
-            patch.set_linewidth(3)
-            # # Add the value number on top of the highest bar
-            # height = patch.get_height()
-            # plot.text(
-            #     patch.get_x() + patch.get_width() / 2.,
-            #     height,
-            #     f'{height:.2f}',
-            #     ha="center",
-            #     va="bottom",
-            #     fontsize=12,
-            #     color='red',
-            #     weight='bold'
-            # )
+    if highlight_max:
+        # Highlight the highest bar in the entire chart
+        max_value = df[metric].max()
+        for patch in plot.patches:
+            if patch.get_height() == max_value:
+                patch.set_edgecolor('red')
+                patch.set_linewidth(3)
+    else:
+        min_value = df[metric].min()
+        for patch in plot.patches:
+            if patch.get_height() == min_value:
+                patch.set_edgecolor('red')
+                patch.set_linewidth(3)
     # Customize the plot
     plot.set_title(f"Model Performance Comparison ({metric})")
     plot.set_ylabel(metric)
     plot.set_xlabel("Model")
     plt.xticks(rotation=45)
-    plt.figtext(0.99, 0.01, "The highlighted bar with the red outline is the highest one",
+    plt.figtext(0.99, 0.01, "The highlighted bar with the red outline is the best one",
                 horizontalalignment='right', fontsize=10, color='red')
     plt.legend(title="Dataset")
     plt.tight_layout()
