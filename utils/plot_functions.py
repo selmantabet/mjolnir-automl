@@ -1,3 +1,10 @@
+""" 
+The Plotting Module - Part of the `utils` library for Project Mjölnir
+
+Developed by Selman Tabet @ https://selman.io/
+----------------------------------------------
+This module contains functions for evaluating models, aggregating results and plotting evaluation metrics.
+"""
 import os
 import numpy as np
 import pandas as pd
@@ -10,7 +17,22 @@ plt.switch_backend('agg')
 
 
 def plot_roc_curve(model_name, labels, predictions, directory, dataset_name):
-    # Generate predictions on the validation set
+    """
+    Plots the Receiver Operating Characteristic (ROC) curve for a given model and dataset, 
+    saves the plot to a specified directory, and returns the optimal threshold.
+
+    Arguments:
+    ----------
+        model_name (`str`): The name of the model being evaluated.
+        labels (`array-like`): True binary labels.
+        predictions (`array-like`): Probability predictions.
+        directory (`str`): The directory where the ROC curve plot will be saved.
+        dataset_name (`str`): The name of the dataset being evaluated.
+
+    Returns:
+    --------
+        `float`: The optimal threshold value that maximizes the difference between true positive rate (TPR) and false positive rate (FPR).
+    """
 
     # Calculate ROC curve and AUC
     fpr, tpr, thresholds = roc_curve(labels, predictions)
@@ -38,6 +60,22 @@ def plot_roc_curve(model_name, labels, predictions, directory, dataset_name):
 
 
 def plot_confusion_matrix(cm, directory, model_name, dataset_name, optimal=False):
+    """
+    Plots and saves a confusion matrix as a heatmap.
+
+    Arguments:
+    ----------
+        cm (`array-like`): Confusion matrix to be plotted.
+        directory (`str`): Directory where the plot will be saved.
+        model_name (`str`): Name of the model.
+        dataset_name (`str`): Name of the dataset.
+        optimal (`bool`, optional): If `True`, indicates that the confusion matrix is optimal. Default is `False`.
+
+    Returns:
+    --------
+        `None`
+    """
+
     class_names = ['fire', 'nofire']
     # Save the confusion matrix plot
     plt.figure(figsize=(10, 7))
@@ -57,6 +95,23 @@ def plot_confusion_matrix(cm, directory, model_name, dataset_name, optimal=False
 
 
 def plot_pr_curve(model_name, labels, predictions, directory, dataset_name):
+    """
+    Plots the Precision-Recall (PR) curve for a given model and dataset, and saves the plot to a specified directory.
+    Also calculates and returns the optimal threshold based on the maximum F1 score.
+
+    Arguments:
+    ----------
+        model_name (`str`): The name of the model being evaluated.
+        labels (`array-like`): True binary labels in range `{0, 1}`.
+        predictions (`array-like`): Estimated probabilities or decision function.
+        directory (`str`): The directory where the PR curve plot will be saved.
+        dataset_name (`str`): The name of the dataset being evaluated.
+
+    Returns:
+    --------
+        `float`: The optimal threshold based on the maximum F1 score.
+    """
+
     # Generate predictions on the validation set
     precision, recall, thresholds = precision_recall_curve(
         labels, predictions)
@@ -85,6 +140,21 @@ def plot_pr_curve(model_name, labels, predictions, directory, dataset_name):
 
 
 def plot_history(run_dir, history, model_name, dataset_name):
+    """
+    Plots and saves the training history of a machine learning model.
+
+    Arguments:
+    ----------
+        run_dir (`str`): The directory where the plots and CSV file will be saved.
+        history (`History`): The history object returned by the `fit` method of a Keras model.
+        model_name (`str`): The name of the model.
+        dataset_name (`str`): The name of the dataset.
+
+    Returns:
+    ------
+        `None` - Saves the plots and CSV file to the specified directory.
+    """
+
     # Ensure all arrays in history.history have the same length
     min_length = min(len(values) for values in history.history.values())
     history_dict = {key: values[:min_length]
@@ -164,6 +234,23 @@ def plot_history(run_dir, history, model_name, dataset_name):
 
 
 def plot_test_images(test_dataset, directory, dataset_name, model, threshold=0.5, optimal=False):
+    """
+    Plots a set of test images with their actual and predicted labels.
+
+    Arguments:
+    ----------
+        test_dataset (`tf.data.Dataset`): The dataset containing test images and labels.
+        directory (`str`): The directory where the plot image will be saved.
+        dataset_name (`str`): The name of the dataset, used in the saved plot image filename.
+        model (`tf.keras.Model`): The trained model used for making predictions.
+        threshold (`float`, optional): The threshold for classifying predictions. Defaults to `0.5`.
+        optimal (`bool`, optional): If `True`, appends '_optimal' to the saved plot image filename. Defaults to `False`.
+
+    Returns:
+    --------
+        `None`
+    """
+
     while True:
         try:
             test_images, test_labels = next(iter(test_dataset))
