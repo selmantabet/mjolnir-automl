@@ -1,5 +1,5 @@
 """ 
-The Data Processing Module - Part of the `utils` library for Project Mjolnir
+The Data Processing Module - Part of the `utils` library for Project Mjölnir
 
 Developed by Selman Tabet @ https://selman.io/
 ----------------------------------------------

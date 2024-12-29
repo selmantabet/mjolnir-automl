@@ -3,6 +3,12 @@ from tensorflow.keras.layers import (
     Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
 )
 
+""" 
+GPT4o generated model for wildfire detection.
+
+Prompt: Generate a Keras Sequential model for binary image classification for wildfire datasets of 2000 to 5000 samples.
+"""
+
 
 def create_wildfire_model(img_height=224, img_width=224):
     model = Sequential()

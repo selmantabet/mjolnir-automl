@@ -1,3 +1,18 @@
+""" 
+Custom Configuration Script - Project Mjölnir
+
+Developed by Selman Tabet @ https://selman.io/
+----------------------------------------------
+This script contains the configuration for the wildfire detection example.
+
+The configuration file can be directly submitted to the main pipeline script with the --from-py-cfg flag.
+
+Do not modify the variable name `cfg` as it is used by the main pipeline script.
+
+Feel free to modify the configuration parameters as needed, make copies of this file for different experiments and use 
+a shell script to run multiple experiments in one batch.
+"""
+
 import os
 from keras.metrics import Precision, Recall, AUC
 from tensorflow.keras.applications import *
@@ -11,34 +26,15 @@ DATASETS = {
         "train": os.path.join("datasets", "dataset_1", "train"),
         "test": os.path.join("datasets", "dataset_1", "test"),
         "val": os.path.join("datasets", "dataset_1", "val"),
-        # "augment": False,
-        "source_url": "https://www.kaggle.com/datasets/elmadafri/the-wildfire-dataset/"
     },
-    # "DeepFire": {
-    #     "train": os.path.join("datasets", "dataset_2", "Training"),
-    #     "test": os.path.join("datasets", "dataset_2", "Testing"),
-    #     # "augment": False,
-    #     "source_url": "https://www.kaggle.com/datasets/alik05/forest-fire-dataset/"
-    # },
-    # "FIRE": {
-    #     "train": os.path.join("datasets", "dataset_3"),
-    #     # "augment": False,
-    #     "source_url": "https://www.kaggle.com/datasets/phylake1337/fire-dataset/"
-    # },
-    # "Forest Fire": {
-    #     "train": os.path.join("datasets", "dataset_4", "train"),
-    #     "test": os.path.join("datasets", "dataset_4", "test"),
-    #     # "augment": False,
-    #     "source_url": "https://www.kaggle.com/datasets/mohnishsaiprasad/forest-fire-images"
-    # },
 }
 
-cfg = {
+cfg = {  # DO NOT MODIFY THE VARIABLE NAME
     "datasets": DATASETS,
-    # "test": "test_combined",
+    "full_test": "test_combined",
     "val_size": 0.2,  # The size of the validation dataset if splitting is needed
-    "keras_models": [MobileNetV3Small],
-    # "custom_models": [create_wildfire_model(224, 224)],
+    "keras_models": [MobileNetV3Small, Xception, InceptionV3, ResNet50, VGG16],
+    "custom_models": [create_wildfire_model(224, 224)],
     "hyperparameters": {
         "batch_size": 32,
         "epochs": 80,
@@ -61,7 +57,5 @@ cfg = {
         ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                           patience=5, verbose=1)
     ],
-    # "enforce_image_settings": True
+    "enforce_image_settings": True
 }
-
-# base_models = [ResNet50V2, InceptionV3, VGG16, VGG19, Xception, MobileNetV3Small, DenseNet121, EfficientNetV2S, CUSTOMNET]

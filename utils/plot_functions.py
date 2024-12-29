@@ -136,8 +136,6 @@ def plot_pr_curve(model_name, labels, predictions, directory, dataset_name):
 
     return optimal_threshold
 
-# Function to plot and save training history
-
 
 def plot_history(run_dir, history, model_name, dataset_name):
     """

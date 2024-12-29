@@ -168,7 +168,8 @@ def plot_sum_of_metrics_heatmaps(eval_dir, df, metric_weights=None):
         plt.figure(figsize=(23, 14))
         heatmap_data = results_df.pivot(
             index='Dataset', columns='Model', values='Weighted Sum')
-        sns.heatmap(heatmap_data, annot=True, fmt=".2f", cmap='RdYlGn')
+        sns.heatmap(heatmap_data, annot=True, fmt=".2f",
+                    cmap='RdYlGn', annot_kws={"size": 20})
         plt.title('Weighted Sum of Metrics Heatmap',
                   fontsize=26, fontweight='bold')
         plt.savefig(os.path.join(
@@ -204,7 +205,8 @@ def plot_sum_of_metrics_heatmaps(eval_dir, df, metric_weights=None):
     plt.figure(figsize=(23, 14))
     heatmap_data = results_df.pivot(
         index='Dataset', columns='Model', values='Unweighted Sum')
-    sns.heatmap(heatmap_data, annot=True, fmt=".2f", cmap='RdYlGn')
+    sns.heatmap(heatmap_data, annot=True, fmt=".2f",
+                cmap='RdYlGn', annot_kws={"size": 20})
     plt.title('Unweighted Sum of Metrics Heatmap',
               fontsize=26, fontweight='bold')
     plt.savefig(os.path.join(
