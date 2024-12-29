@@ -27,6 +27,10 @@ DATASETS = {
         "test": os.path.join("datasets", "dataset_1", "test"),
         "val": os.path.join("datasets", "dataset_1", "val"),
     },
+    "DeepFire": {
+        "train": os.path.join("datasets", "dataset_2", "Training"),
+        "test": os.path.join("datasets", "dataset_2", "Testing"),
+    },
 }
 
 cfg = {  # DO NOT MODIFY THE VARIABLE NAME
