@@ -19,33 +19,22 @@ def validate_config_structure(config):
 
 
 def validate_data_types(config):
-    if 'enforce_image_settings' in config:
-        assert isinstance(config['enforce_image_settings'], bool), f"enforce_image_settings must be a boolean, got {
-            type(config['enforce_image_settings'])}"
-    if 'datasets' in config:
-        assert isinstance(config['datasets'], dict), f"datasets must be a dictionary, got {
-            type(config['datasets'])}"
-    if 'hyperparameters' in config:
-        assert isinstance(config['hyperparameters'], dict), f"hyperparameters must be a dictionary, got {
-            type(config['hyperparameters'])}"
-    if 'metrics' in config:
-        assert isinstance(config['metrics'], list), f"metrics must be a list, got {
-            type(config['metrics'])}"
-    if 'callbacks' in config:
-        assert isinstance(config['callbacks'], list), f"callbacks must be a list, got {
-            type(config['callbacks'])}"
-    if 'image_width' in config:
-        assert isinstance(config['image_width'], int), f"image_width must be an integer, got {
-            type(config['image_width'])}"
-    if 'image_height' in config:
-        assert isinstance(config['image_height'], int), f"image_height must be an integer, got {
-            type(config['image_height'])}"
-    if 'metric_weights' in config:
-        assert isinstance(config['metric_weights'], dict), f"metric_weights must be a dictionary, got {
-            type(config['metric_weights'])}"
-    if 'val_size' in config:
-        assert isinstance(config['val_size'], float), f"val_size must be a float, got {
-            type(config['val_size'])}"
+    type_checks = {
+        'enforce_image_settings': bool,
+        'datasets': dict,
+        'hyperparameters': dict,
+        'metrics': list,
+        'callbacks': list,
+        'image_width': int,
+        'image_height': int,
+        'metric_weights': dict,
+        'val_size': float
+    }
+
+    for key, expected_type in type_checks.items():
+        if key in config:
+            assert isinstance(config[key], expected_type), f"{key} must be a {
+                expected_type.__name__}, got {type(config[key]).__name__}"
 
 
 def validate_datasets_paths(config):
