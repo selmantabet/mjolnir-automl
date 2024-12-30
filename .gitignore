@@ -5,8 +5,6 @@
 /dataset_2
 /forest_fire
 /req_cmd.txt
-/runs/*
-!/runs
 /backup
 /venv
 /checkpoint
