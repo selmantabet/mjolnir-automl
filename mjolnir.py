@@ -23,7 +23,7 @@ import importlib.util  # To import config module from str
 from pprint import pprint  # To show config
 
 # Custom helper functions
-from utils.img_processing import enforce_image_params
+from utils.img_processors import enforce_image_params
 # Dataset and generator processing functions
 from utils.dataset_processors import *
 from utils.plot_functions import *  # Plotting functions
