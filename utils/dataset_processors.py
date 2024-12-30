@@ -257,6 +257,21 @@ def create_split_generators(directory, val_size=0.2, batch_size=32, img_height=2
 
 
 def generators_to_dataset(generators, batch_size=32, img_height=224, img_width=224):
+    """
+    Converts a list of `ImageDataGenerator` into a single concatenated dataset.
+
+    Arguments:
+    -----------
+        generators (`list`): A list of `ImageDataGenerator` objects.
+        batch_size (`int`, optional): The size of the batches of data. Defaults to `32`.
+        img_height (`int`, optional): The height of the images in the dataset. Defaults to `224`.
+        img_width (`int`, optional): The width of the images in the dataset. Defaults to `224`.
+
+    Returns:
+    --------
+        `tf.data.Dataset`: A concatenated `DatasetV2` object containing data from all the provided generators.
+    """
+
     dataset = None
     for generator in generators:
         if generator is not None:
