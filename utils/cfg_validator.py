@@ -57,7 +57,7 @@ def validate_dataset_loading(config):
             dataset_paths['train'],
             target_size=(config.get('image_width', 224),
                          config.get('image_height', 224)),
-            batch_size=config['hyperparameters']['batch_size'],
+            batch_size=config['hyperparameters'].get('batch_size', 32),
             class_mode='binary'
         )
         assert train_gen.samples > 0, f"No samples found in training set for {
