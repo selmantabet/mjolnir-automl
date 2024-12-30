@@ -18,7 +18,7 @@ from keras.metrics import Precision, Recall, AUC
 from tensorflow.keras.applications import *
 from custom_metrics import f1_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-# WildfireNet model, for comparison to other SOTA models in dissertation.
+# WildfireNet model to compare to other SOTA models here.
 from wildfirenet import create_wildfire_model
 
 DATASETS = {
@@ -35,7 +35,7 @@ DATASETS = {
 
 cfg = {  # DO NOT MODIFY THE VARIABLE NAME
     "datasets": DATASETS,
-    "full_test": "test_combined",
+    "full_test": os.path.join("datasets", "d4_test"),
     "val_size": 0.2,  # The size of the validation dataset if splitting is needed
     "keras_models": [MobileNetV3Small, Xception, InceptionV3, ResNet50, VGG16],
     "custom_models": [create_wildfire_model(224, 224)],
