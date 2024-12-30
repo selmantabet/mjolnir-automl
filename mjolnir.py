@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Project Mjölnir: An Automated Brute-Force Dataset Combinatorics Training and Evaluation Pipeline for Computer Vision - by Selman Tabet @ https://selman.io/
+# # Project Mjölnir: An Automated Brute-Force Dataset-Model Combinatorics Training and Evaluation Pipeline for Computer Vision - by Selman Tabet @ https://selman.io/
 
 # %% [markdown]
 # ### Importing Libraries
@@ -275,6 +275,8 @@ for d in training_datasets:
         val_generator = create_generator(
             training_datasets[d]['val'], batch_size=batch_size, augment=False, shuffle=False, img_width=img_width, img_height=img_height)
     else:  # Split the training dataset into training and validation
+        print(f"No validation set provided for {
+              d}, splitting training dataset.")
         train_generator, val_generator = create_split_generators(
             train_dir, val_size=val_size, batch_size=batch_size, augment=augment, img_width=img_width, img_height=img_height)
 
