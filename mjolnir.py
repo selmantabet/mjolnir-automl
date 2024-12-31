@@ -454,6 +454,9 @@ def generate_model(bm, custom=False, to_dir=TEMP_DIR):
 
 
 # %%
+if not os.path.exists("runs"):
+    os.makedirs("runs")
+
 run_number = len([d for d in os.listdir("runs") if os.path.isdir(
     os.path.join("runs", d)) and d.startswith('run_')]) + 1
 run_dir = os.path.join("runs", f"run_{run_number}")

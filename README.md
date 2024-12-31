@@ -57,7 +57,6 @@ The directory tree should look something like this:
 ```
 mjolnir-automl/
 ├── data/
-├── runs/
 ├── utils/
 │   ├── cfg_validator.py
 │   ├── dataset_processors.py

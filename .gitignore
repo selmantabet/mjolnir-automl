@@ -9,6 +9,7 @@
 /venv
 /checkpoint
 /old
+/runs
 /__pycache__
 /tmp
 *.jpg
