@@ -2,7 +2,7 @@ import socket
 import os
 import tensorflow as tf
 TEMP_DIR = "tmp"
-
+os.makedirs(TEMP_DIR, exist_ok=True)
 print("Hostname: ", socket.gethostname())
 try:  # for CUDA enviroment
     os.system("nvidia-smi")  # Check GPU
