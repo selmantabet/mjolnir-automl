@@ -132,7 +132,7 @@ def plot_sum_of_metrics_heatmaps(eval_dir, df, metric_weights=None):
 
     # Drop irrelevant columns
     df = df.drop(columns=['Train Size', 'Val Size', 'Training Time',
-                 'Optimal Threshold', 'Train Counts', 'Val Counts'])
+                 'Optimal Threshold', 'Train Counts', 'Val Counts', 'loss'])
     if metric_weights is not None or metric_weights != {}:
         # Ensure metric_weights keys are lowercase
         metric_weights = {k.lower(): v for k, v in metric_weights.items()}
