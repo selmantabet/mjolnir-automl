@@ -16,6 +16,10 @@ This project was made as part of my dissertation for my MSc in Computing and IT 
 - **Saves Model Artifacts**: Saves every pairing's model artifacts for future use.
 - **Comprehensive Data Visualization**: Generates insightful visualizations to help compare model-data pairing performances.
 
+## Important Note
+
+This project has been written in Python 3.12.8. The pipeline will not work on Python 3.11 or lower due to the use of multi-line F-strings. Please ensure you have Python 3.12.8 or later installed on your system.
+
 ## Installation
 
 1. **Clone the repository**:
