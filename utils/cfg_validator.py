@@ -102,7 +102,7 @@ def validate_model_compilation(config):
 
 def validate_metrics(config):
     from tensorflow.keras.metrics import get as get_metric
-    for metric in config['metrics']:
+    for metric in config.get('metrics', []):
         try:
             get_metric(metric)
         except ValueError:
@@ -112,7 +112,7 @@ def validate_metrics(config):
 
 def validate_callbacks(config):
     from tensorflow.keras.callbacks import Callback
-    for callback in config['callbacks']:
+    for callback in config.get('callbacks', []):
         assert isinstance(callback, Callback), f"Callback {
             callback} is not an instance of Keras Callback."
 
