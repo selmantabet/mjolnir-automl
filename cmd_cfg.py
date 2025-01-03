@@ -61,5 +61,12 @@ cfg = {  # DO NOT MODIFY THE VARIABLE NAME
         ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                           patience=5, verbose=1)
     ],
-    "enforce_image_settings": True
+    "enforce_image_settings": True,
+    "metric_weights": {  # Weights for each metric for Weighted Sum of Metrics Calculation
+        "accuracy": 1,
+        "precision": 1,
+        "recall": 1.3,
+        "auc": 1.2,
+        "f1_score": 1
+    }
 }
