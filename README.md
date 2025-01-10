@@ -6,7 +6,7 @@ Project Mjölnir is an AutoML pipeline designed to automatically train and test 
 
 Note that the pipeline is built for binary image classification tasks, but can be extended to other types of tasks with further modifications.
 
-This project was made as part of my dissertation for my MSc in Computing and IT Management at Cardiff University.
+This project is the central theme in the [dissertation for my MSc in Computing and IT Management at Cardiff University.](https://www.selman.io/s/Dissertation-Final-Draft.pdf)
 
 ## Features
 
