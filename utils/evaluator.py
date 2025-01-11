@@ -456,9 +456,7 @@ def plot_time_extrapolation(df, dir):
         lambda x: '_' not in x)]['Dataset'].nunique()
     print(f"Number of Singular Datasets: {num_singular_datasets}")
     # Define the range of models and datasets
-    # Number of models from 1 to 10
     models = np.arange(1, num_distinct_models+2, 1)
-    # Number of datasets from 1 to 10
     datasets = np.arange(1, num_singular_datasets+2, 1)
 
     # Create meshgrid for 3D plotting
