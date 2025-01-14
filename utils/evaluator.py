@@ -442,7 +442,7 @@ def plot_time_extrapolation(df, dir):
     -----
         `None` - The function saves the plot as a PNG file in the specified directory.
 
-    The function calculates the average training time, the number of distinct models, and the number of singular datasets 
+    The function calculates the average training time, the number of distinct models, and the number of distinct datasets 
     (datasets without an underscore in their name). It then creates a 3D surface plot showing the extrapolated training 
     time as a function of the number of models and datasets, and saves the plot as `training_time_extrapolation.png` 
     in the specified directory.
@@ -452,12 +452,12 @@ def plot_time_extrapolation(df, dir):
     print(f"Average Training Time: {average_training_time}")
     num_distinct_models = df['Model'].nunique()
     print(f"Number of Distinct Models: {num_distinct_models}")
-    num_singular_datasets = df[df['Dataset'].apply(
+    num_distinct_datasets = df[df['Dataset'].apply(
         lambda x: '_' not in x)]['Dataset'].nunique()
-    print(f"Number of Singular Datasets: {num_singular_datasets}")
+    print(f"Number of Distinct Datasets: {num_distinct_datasets}")
     # Define the range of models and datasets
     models = np.arange(1, num_distinct_models+2, 1)
-    datasets = np.arange(1, num_singular_datasets+2, 1)
+    datasets = np.arange(1, num_distinct_datasets+2, 1)
 
     # Create meshgrid for 3D plotting
     models_grid, datasets_grid = np.meshgrid(models, datasets)
